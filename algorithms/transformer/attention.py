@@ -19,7 +19,7 @@ class MultiHeadAttention(nn.Module):
             self.q_linearizers.append(SingleLayerPerceptron(self.d_model, self.dk))
             self.k_linearizers.append(SingleLayerPerceptron(self.d_model, self.dk))
 
-    def forward(self, query, key, value):
+    def forward(self, query, key, value, mask = None):
         attentions = []
 
         for i in range(0, self.n_heads):
@@ -32,17 +32,21 @@ class MultiHeadAttention(nn.Module):
             linearized_value = current_v_linearizer(value)
 
             attentions.append(self.scaledDotProductAttention(
-                linearized_query, linearized_key, linearized_value))
+                linearized_query, linearized_key, linearized_value, mask))
 
         concatenated_attentions = torch.cat(attentions, dim=1)
         result = self.o_linearizer(concatenated_attentions)
         return result
 
-    def scaledDotProductAttention(query, key, value):
+    def scaledDotProductAttention(self, query, key, value, mask = None):
         result = torch.matmul(query, key.t())
 
         scale_factor = math.sqrt(int(query.size()[1]))
         result = result / scale_factor
+
+        # insert logic for masking all indeces with mask = 1 to be -inf
+        if mask is not None:
+            result = result.masked_fill(mask == 0, float("-Inf"))
 
         softmaxer = nn.Softmax(dim=0)
         result = softmaxer(result)

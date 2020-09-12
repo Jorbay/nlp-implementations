@@ -1,4 +1,6 @@
+import torch
 import torch.nn as nn
+import numpy as np
 
 class SingleLayerPerceptron(nn.Module):
     def __init__(self, d_input, d_output):
@@ -21,3 +23,12 @@ class FeedForwardNetwork(nn.Module):
         relu = self.relu(hidden)
         output = self.fc2(relu)
         return output
+
+def make_mask(number_of_tokens):
+  #Following was from http://juditacs.github.io/2018/12/27/masked-attention.html
+  #Annotated AIAYN recommends instead using np.triu
+  #mask = torch.arange(number_of_tokens)[None, :] < mask_range[:, None]
+  base_of_ones = np.ones((number_of_tokens, number_of_tokens))
+
+  subsequent_mask = np.tril(base_of_ones, k=0).astype('uint8')
+  return torch.from_numpy(subsequent_mask)

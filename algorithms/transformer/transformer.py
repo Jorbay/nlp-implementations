@@ -31,7 +31,7 @@ class Transformer():
         def forward(self, src: torch.Tensor, src_mask: Optional[torch.Tensor] = None,
                     src_key_padding_mask: Optional[torch.Tensor] = None):
             "Take in embedding and output hidden state + output of type torch.Tensor"
-            result = self.multiHeadAttention.forward(src, src, src)
+            result = self.multiHeadAttention.forward(src, src, src, src_mask)
             result = self.__addAndNorm(result, src)
 
             feed_forward_result = self.feedForwardNetwork.forward(result)
@@ -60,9 +60,10 @@ class Transformer():
                     src_key_padding_mask: Optional[Tensor] = None) -> Tensor:
             output = src
             for layer in self.layers:
-                output = layer.forward(output)
+                output = layer.forward(output, src_mask=mask)
             return output
 
         # From Pytorch 1.6.0
         def _get_clones(self, module, N):
             return ModuleList([copy.deepcopy(module) for i in range(N)])
+    
