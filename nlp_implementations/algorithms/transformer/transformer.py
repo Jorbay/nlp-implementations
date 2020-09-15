@@ -66,4 +66,15 @@ class Transformer():
         # From Pytorch 1.6.0
         def _get_clones(self, module, N):
             return ModuleList([copy.deepcopy(module) for i in range(N)])
-    
+
+    class TransformerDecoderLayer(nn.Module):
+        def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1,
+                     activation="relu"):
+            pass
+
+        def forward(self, tgt: Tensor, memory: Tensor,
+                    tgt_mask: Optional[Tensor] = None,
+                    memory_mask: Optional[Tensor] = None,
+                    tgt_key_padding_mask: Optional[Tensor] = None,
+                    memory_key_padding_mask: Optional[Tensor] = None) -> Tensor:
+            pass
