@@ -97,3 +97,32 @@ class Transformer():
         def __addAndNorm(self, ultima, penultima):
             sum = ultima + penultima
             return self.normalizer(sum)
+
+    class TransformerDecoder(nn.Module):
+        def __init__(self, decoder_layer, num_layers, norm=None):
+            super(Transformer.TransformerDecoder, self).__init__()
+            self.layers = self._get_clones(decoder_layer, num_layers)
+            self.num_layers = num_layers
+
+        def forward(self, tgt: Tensor, memory: Tensor, tgt_mask: Optional[Tensor] = None,
+                    memory_mask: Optional[Tensor] = None, tgt_key_padding_mask: Optional[Tensor] = None,
+                    memory_key_padding_mask: Optional[Tensor] = None) -> Tensor:
+            output = tgt
+            for layer in self.layers:
+                output = layer.forward(tgt, memory, tgt_mask)
+            return output
+
+        # From Pytorch 1.6.0
+        def _get_clones(self, module, N):
+            return ModuleList([copy.deepcopy(module) for i in range(N)])
+
+    class Decoder2OutputProbabilities(nn.Module):
+        def __init__(self, d_model, vocab):
+            super(Transformer.Decoder2OutputProbabilities, self).__init__()
+            self.linear_layer = nn.Linear(d_model, vocab)
+            self.softmax_layer = nn.SoftMax(dim=0)
+
+        def forward(self,x):
+            linear_result = self.linear_layer(x)
+            result = self.softmax_layer(linear_result)
+            return result
