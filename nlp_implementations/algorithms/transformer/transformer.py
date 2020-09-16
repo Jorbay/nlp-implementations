@@ -70,6 +70,7 @@ class Transformer():
     class TransformerDecoderLayer(nn.Module):
         def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1,
                      activation="relu"):
+            super(Transformer.TransformerDecoderLayer, self).__init__()
             self.normalizer = nn.LayerNorm(d_model)
             self.multiHeadAttention = MultiHeadAttention(nhead, d_model)
             self.feedForwardNetwork = FeedForwardNetwork(d_model, dim_feedforward, d_model)
