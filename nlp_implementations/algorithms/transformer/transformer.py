@@ -70,11 +70,29 @@ class Transformer():
     class TransformerDecoderLayer(nn.Module):
         def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1,
                      activation="relu"):
-            pass
+            self.normalizer = nn.LayerNorm(d_model)
+            self.multiHeadAttention = MultiHeadAttention(nhead, d_model)
+            self.feedForwardNetwork = FeedForwardNetwork(d_model, dim_feedforward, d_model)
 
         def forward(self, tgt: Tensor, memory: Tensor,
                     tgt_mask: Optional[Tensor] = None,
                     memory_mask: Optional[Tensor] = None,
                     tgt_key_padding_mask: Optional[Tensor] = None,
                     memory_key_padding_mask: Optional[Tensor] = None) -> Tensor:
-            pass
+            # TGT is the target input
+            # Memory is the hidden state from the encoder
+            # TGT_mask is the mask needed for masked multi-head attention
+            result = self.multiHeadAttention.forward(tgt, tgt, tgt, tgt_mask)
+            result = self.__addAndNorm(result, tgt)
+
+            intermediate_result = self.multiHeadAttention.forward(memory, memory, tgt)
+            result = self.__addAndNorm(intermediate_result, result)
+
+            feed_forward_result = self.feedForwardNetwork.forward(result)
+            result = self.__addAndNorm(feed_forward_result, result)
+
+            return result
+
+        def __addAndNorm(self, ultima, penultima):
+            sum = ultima + penultima
+            return self.normalizer(sum)
