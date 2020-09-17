@@ -32,3 +32,21 @@ def make_mask(number_of_tokens):
 
   subsequent_mask = np.tril(base_of_ones, k=0).astype('uint8')
   return torch.from_numpy(subsequent_mask)
+
+def make_positional_encoding(number_of_tokens, d_model):
+    position_tensor = torch.arange(end=number_of_tokens)
+    position_tensor = torch.transpose(position_tensor.unsqueeze(0), 0, 1)
+    position_tensor = position_tensor.repeat(1, d_model)
+
+    dimension_tensor = torch.arange(end=d_model)
+    dimension_tensor = dimension_tensor.repeat(number_of_tokens, 1)
+
+    angles = torch.div(position_tensor, torch.pow(10000, torch.true_divide(
+        2 * dimension_tensor, d_model)))
+
+    encodings = angles.clone()
+    # Apply sin to even dimensions and cos to odd dimensions
+    encodings[:, 0::2] = torch.sin(encodings[:, 0::2])
+    encodings[:, 1::2] = torch.cos(encodings[:, 1::2])
+
+    return encodings
