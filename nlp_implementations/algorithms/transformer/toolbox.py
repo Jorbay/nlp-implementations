@@ -34,6 +34,7 @@ def make_mask(number_of_tokens):
   return torch.from_numpy(subsequent_mask)
 
 def make_positional_encoding(number_of_tokens, d_model):
+    #The following is defined in section 3.5 from AIAYN
     position_tensor = torch.arange(end=number_of_tokens)
     position_tensor = torch.transpose(position_tensor.unsqueeze(0), 0, 1)
     position_tensor = position_tensor.repeat(1, d_model)
