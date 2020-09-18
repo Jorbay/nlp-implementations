@@ -38,6 +38,7 @@ class TestClass:
 
 
         example_input_words = torch.LongTensor([1,2,3])
+        example_next_words = torch.LongTensor([2,3,4])
 
         words2Embeddings = Transformer.Words2Embeddings(self.d_model, self.vocab)
         encoder_layer = Transformer.TransformerEncoderLayer(self.d_model, self.number_of_heads)
@@ -46,9 +47,11 @@ class TestClass:
         decoder = Transformer.TransformerDecoder(decoder_layer, number_of_decoder_layers)
         decoder_to_probabilities = Transformer.Decoder2OutputProbabilities(self.d_model, self.vocab)
 
-        embeddings = words2Embeddings.forward(example_input_words)
-        encoder_result = encoder.forward(embeddings)
+        input_embeddings = words2Embeddings.forward(example_input_words)
+        next_embeddings = words2Embeddings.forward(example_next_words)
+
+        encoder_result = encoder.forward(input_embeddings)
 
         decoder_mask = make_mask(number_of_tokens)
-        decoder_result = decoder.forward(encoder_result, encoder_result, decoder_mask)
+        decoder_result = decoder.forward(next_embeddings, encoder_result, decoder_mask)
         result = decoder_to_probabilities.forward(decoder_result)
