@@ -6,7 +6,8 @@ import math, copy
 from torch.nn.modules.container import ModuleList
 from torch import Tensor
 from .attention import MultiHeadAttention
-from .toolbox import FeedForwardNetwork
+from .toolbox import FeedForwardNetwork, make_positional_encoding
+from .embedding import Embedding
 
 #From torch documentation for api:
 #https://pytorch.org/docs/stable/_modules/torch/nn/modules/transformer.html#TransformerEncoderLayer.forward
@@ -120,9 +121,24 @@ class Transformer():
         def __init__(self, d_model, vocab):
             super(Transformer.Decoder2OutputProbabilities, self).__init__()
             self.linear_layer = nn.Linear(d_model, vocab)
-            self.softmax_layer = nn.SoftMax(dim=0)
+            self.softmax_layer = nn.Softmax(dim=0)
 
         def forward(self,x):
             linear_result = self.linear_layer(x)
             result = self.softmax_layer(linear_result)
             return result
+
+    class Words2Embeddings(nn.Module):
+        def __init__(self, d_model, vocab):
+            super(Transformer.Words2Embeddings, self).__init__()
+            self.embedder = Embedding(d_model, vocab)
+            self.d_model = d_model
+            self.vocab = vocab
+
+        def forward(self, x):
+            embedded = self.embedder.forward(x)
+            number_of_tokens = embedded.size()[0]
+
+            positional_encoding = make_positional_encoding(number_of_tokens, self.d_model)
+
+            return embedded + positional_encoding

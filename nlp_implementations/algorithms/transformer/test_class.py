@@ -1,14 +1,16 @@
 from .attention import MultiHeadAttention
 from .embedding import Embedding
 from .toolbox import SingleLayerPerceptron, make_mask
+from .transformer import Transformer
 import torch
 
 class TestClass:
+    d_model = 512
+    number_of_heads = 8
+    d_k = int(d_model / number_of_heads)
+    vocab = 37000
 
     def test_scaledDotProductAttention(self):
-        d_model = 512
-        d_k = 64
-        number_of_heads = int(d_model / d_k)
         number_of_tokens = 3
 
         example_query = torch.tensor([[1, 1], [1, 1], [1,1]], dtype=torch.float64)
@@ -16,7 +18,7 @@ class TestClass:
         example_value = example_query.detach().clone()
         mask = make_mask(number_of_tokens)
 
-        multi_head_attention = MultiHeadAttention(number_of_heads, d_model)
+        multi_head_attention = MultiHeadAttention(self.number_of_heads, self.d_model)
 
         result_without_mask = multi_head_attention.scaledDotProductAttention(example_query, example_key, example_value)
         result_with_mask = multi_head_attention.scaledDotProductAttention(example_query, example_key, example_value,
@@ -28,3 +30,25 @@ class TestClass:
 
         #TODO: Fix this assert for the expected result of mask.
         #assert torch.equal(result_with_mask, expected_result_with_mask)
+
+    def test_encoder_and_decoder_integration(self):
+        number_of_tokens = 3
+        number_of_encoder_layers = 6
+        number_of_decoder_layers = 6
+
+
+        example_input_words = torch.LongTensor([1,2,3])
+
+        words2Embeddings = Transformer.Words2Embeddings(self.d_model, self.vocab)
+        encoder_layer = Transformer.TransformerEncoderLayer(self.d_model, self.number_of_heads)
+        encoder = Transformer.TransformerEncoder(encoder_layer, number_of_encoder_layers)
+        decoder_layer = Transformer.TransformerDecoderLayer(self.d_model, self.number_of_heads)
+        decoder = Transformer.TransformerDecoder(decoder_layer, number_of_decoder_layers)
+        decoder_to_probabilities = Transformer.Decoder2OutputProbabilities(self.d_model, self.vocab)
+
+        embeddings = words2Embeddings.forward(example_input_words)
+        encoder_result = encoder.forward(embeddings)
+
+        decoder_mask = make_mask(number_of_tokens)
+        decoder_result = decoder.forward(encoder_result, encoder_result, decoder_mask)
+        result = decoder_to_probabilities.forward(decoder_result)
