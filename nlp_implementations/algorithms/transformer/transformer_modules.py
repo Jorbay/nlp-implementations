@@ -117,9 +117,9 @@ class TransformerModules():
         def _get_clones(self, module, N):
             return ModuleList([copy.deepcopy(module) for i in range(N)])
 
-    class Decoder2OutputProbabilities(nn.Module):
+    class TokenDecoder(nn.Module):
         def __init__(self, d_model, vocab):
-            super(TransformerModules.Decoder2OutputProbabilities, self).__init__()
+            super(TransformerModules.TokenDecoder, self).__init__()
             self.linear_layer = nn.Linear(d_model, vocab)
             self.softmax_layer = nn.Softmax(dim=0)
 
@@ -128,9 +128,9 @@ class TransformerModules():
             result = self.softmax_layer(linear_result)
             return result
 
-    class Words2Embeddings(nn.Module):
+    class TokenEncoder(nn.Module):
         def __init__(self, d_model, vocab):
-            super(TransformerModules.Words2Embeddings, self).__init__()
+            super(TransformerModules.TokenEncoder, self).__init__()
             self.embedder = Embedding(d_model, vocab)
             self.d_model = d_model
             self.vocab = vocab
