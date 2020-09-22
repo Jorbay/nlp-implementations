@@ -13,7 +13,7 @@ from .embedding import Embedding
 #https://pytorch.org/docs/stable/_modules/torch/nn/modules/transformer.html#TransformerEncoderLayer.forward
 from typing import Optional
 
-class Transformer():
+class TransformerModules():
 
     class TransformerEncoderLayer(nn.Module):
         """
@@ -24,7 +24,7 @@ class Transformer():
 
         def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1,
                      activation='relu'):
-            super(Transformer.TransformerEncoderLayer, self).__init__()
+            super(TransformerModules.TransformerEncoderLayer, self).__init__()
             self.normalizer = nn.LayerNorm(d_model)
             self.multiHeadAttention = MultiHeadAttention(nhead, d_model)
             self.feedForwardNetwork = FeedForwardNetwork(d_model, dim_feedforward, d_model)
@@ -53,7 +53,7 @@ class Transformer():
         """
 
         def __init__(self, encoder_layer, num_layers, norm=None):
-            super(Transformer.TransformerEncoder, self).__init__()
+            super(TransformerModules.TransformerEncoder, self).__init__()
             self.layers = self._get_clones(encoder_layer, num_layers)
             self.num_layers = num_layers
 
@@ -71,7 +71,7 @@ class Transformer():
     class TransformerDecoderLayer(nn.Module):
         def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1,
                      activation="relu"):
-            super(Transformer.TransformerDecoderLayer, self).__init__()
+            super(TransformerModules.TransformerDecoderLayer, self).__init__()
             self.normalizer = nn.LayerNorm(d_model)
             self.multiHeadAttention = MultiHeadAttention(nhead, d_model)
             self.feedForwardNetwork = FeedForwardNetwork(d_model, dim_feedforward, d_model)
@@ -101,7 +101,7 @@ class Transformer():
 
     class TransformerDecoder(nn.Module):
         def __init__(self, decoder_layer, num_layers, norm=None):
-            super(Transformer.TransformerDecoder, self).__init__()
+            super(TransformerModules.TransformerDecoder, self).__init__()
             self.layers = self._get_clones(decoder_layer, num_layers)
             self.num_layers = num_layers
 
@@ -119,7 +119,7 @@ class Transformer():
 
     class Decoder2OutputProbabilities(nn.Module):
         def __init__(self, d_model, vocab):
-            super(Transformer.Decoder2OutputProbabilities, self).__init__()
+            super(TransformerModules.Decoder2OutputProbabilities, self).__init__()
             self.linear_layer = nn.Linear(d_model, vocab)
             self.softmax_layer = nn.Softmax(dim=0)
 
@@ -130,7 +130,7 @@ class Transformer():
 
     class Words2Embeddings(nn.Module):
         def __init__(self, d_model, vocab):
-            super(Transformer.Words2Embeddings, self).__init__()
+            super(TransformerModules.Words2Embeddings, self).__init__()
             self.embedder = Embedding(d_model, vocab)
             self.d_model = d_model
             self.vocab = vocab

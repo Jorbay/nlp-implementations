@@ -1,7 +1,7 @@
 from .attention import MultiHeadAttention
 from .embedding import Embedding
 from .toolbox import SingleLayerPerceptron, make_mask
-from .transformer import Transformer
+from .transformer_modules import TransformerModules
 import torch
 
 class TestClass:
@@ -40,12 +40,12 @@ class TestClass:
         example_input_words = torch.LongTensor([1,2,3])
         example_next_words = torch.LongTensor([2,3,4])
 
-        words2Embeddings = Transformer.Words2Embeddings(self.d_model, self.vocab)
-        encoder_layer = Transformer.TransformerEncoderLayer(self.d_model, self.number_of_heads)
-        encoder = Transformer.TransformerEncoder(encoder_layer, number_of_encoder_layers)
-        decoder_layer = Transformer.TransformerDecoderLayer(self.d_model, self.number_of_heads)
-        decoder = Transformer.TransformerDecoder(decoder_layer, number_of_decoder_layers)
-        decoder_to_probabilities = Transformer.Decoder2OutputProbabilities(self.d_model, self.vocab)
+        words2Embeddings = TransformerModules.Words2Embeddings(self.d_model, self.vocab)
+        encoder_layer = TransformerModules.TransformerEncoderLayer(self.d_model, self.number_of_heads)
+        encoder = TransformerModules.TransformerEncoder(encoder_layer, number_of_encoder_layers)
+        decoder_layer = TransformerModules.TransformerDecoderLayer(self.d_model, self.number_of_heads)
+        decoder = TransformerModules.TransformerDecoder(decoder_layer, number_of_decoder_layers)
+        decoder_to_probabilities = TransformerModules.Decoder2OutputProbabilities(self.d_model, self.vocab)
 
         input_embeddings = words2Embeddings.forward(example_input_words)
         next_embeddings = words2Embeddings.forward(example_next_words)
