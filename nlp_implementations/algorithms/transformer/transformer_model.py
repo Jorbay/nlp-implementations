@@ -7,6 +7,7 @@ from .transformer_modules import TransformerDecoder, TransformerEncoder, Transfo
 class TransformerModel(nn.Module):
 
     def __init__(self, ntokens_per_batch, nencoder_layers, ndecoder_layers, d_model, nheads, vocab):
+        super(TransformerModel, self).__init__()
         self.ntokens_per_batch = ntokens_per_batch
         self.nencoder_layers = nencoder_layers
         self.ndecoder_layers = ndecoder_layers
