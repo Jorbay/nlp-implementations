@@ -32,3 +32,5 @@ class TransformerModel(nn.Module):
         output_encoded = self.transformer_decoder.forward(target, memory)
 
         output = self.token_decoder.forward(output_encoded)
+
+        return output
