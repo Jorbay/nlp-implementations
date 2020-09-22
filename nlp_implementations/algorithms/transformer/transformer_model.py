@@ -28,7 +28,7 @@ class TransformerModel(nn.Module):
         #TODO: I need to also make an encoding of expected output (src shifted)
         target = None
 
-        memory = self.transformer_encoder.forward(src)
+        memory = self.transformer_encoder.forward(src_encoded)
         output_encoded = self.transformer_decoder.forward(target, memory)
 
         output = self.token_decoder.forward(output_encoded)
