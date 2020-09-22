@@ -15,10 +15,9 @@ class TransformerModel(nn.Module):
         self.nheads = nheads
         self.vocab = vocab
 
-        self.d_k = int(self.d_model/ self.nheads)
         self.token_encoder = TokenEncoder(self.d_model, self.vocab)
-        self.transformer_encoder_layer = TransformerEncoderLayer(self.d_mdoel, self.nheads)
-        self.transformer_encoder = TransformerEncoder(self.transformer_encoder, self.nencoder_layers)
+        self.transformer_encoder_layer = TransformerEncoderLayer(self.d_model, self.nheads)
+        self.transformer_encoder = TransformerEncoder(self.transformer_encoder_layer, self.nencoder_layers)
         self.transformer_decoder_layer = TransformerDecoderLayer(self.d_model, self.nheads)
         self.transformer_decoder = TransformerDecoder(self.transformer_decoder_layer, self.ndecoder_layers)
         self.token_decoder = TokenDecoder(self.d_model, self.vocab)
