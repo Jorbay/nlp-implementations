@@ -50,4 +50,6 @@ def make_positional_encoding(number_of_tokens, d_model):
     encodings[:, 0::2] = torch.sin(encodings[:, 0::2])
     encodings[:, 1::2] = torch.cos(encodings[:, 1::2])
 
+    encodings = encodings.unsqueeze(0).transpose(0, 1)
+
     return encodings
