@@ -34,14 +34,15 @@ class MultiHeadAttention(nn.Module):
             attentions.append(self.scaledDotProductAttention(
                 linearized_query, linearized_key, linearized_value, mask))
 
-        concatenated_attentions = torch.cat(attentions, dim=1)
+        concatenated_attentions = torch.cat(attentions, dim=2)
         result = self.o_linearizer(concatenated_attentions)
         return result
 
     def scaledDotProductAttention(self, query, key, value, mask = None):
-        result = torch.matmul(query, key.t())
+        result = torch.matmul(query, key.transpose(-2, -1))
+        d_k = int(query.size(-1))
 
-        scale_factor = math.sqrt(int(query.size()[1]))
+        scale_factor = math.sqrt(d_k)
         result = result / scale_factor
 
         # insert logic for masking all indeces with mask = 1 to be -inf

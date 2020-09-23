@@ -56,3 +56,13 @@ class TestClass:
         decoder_mask = make_mask(number_of_tokens)
         decoder_result = decoder.forward(next_embeddings, encoder_result, decoder_mask)
         result = decoder_to_probabilities.forward(decoder_result)
+
+    def test_token_encoder(self):
+        number_of_tokens = 3
+        example_input_words_1 = torch.LongTensor([1,2,3])
+        example_input_words_2 = torch.LongTensor([[1,2,3], [2,3,4]])
+
+        token_encoder = TokenEncoder(self.d_model, self.vocab)
+
+        input_embeddings_1 = token_encoder.forward(example_input_words_1)
+        input_embeddings_2 = token_encoder.forward(example_input_words_2)
