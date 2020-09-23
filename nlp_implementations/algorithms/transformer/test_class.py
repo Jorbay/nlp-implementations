@@ -38,8 +38,8 @@ class TestClass:
         number_of_decoder_layers = 6
 
 
-        example_input_words = torch.LongTensor([1,2,3])
-        example_next_words = torch.LongTensor([2,3,4])
+        example_input_words = torch.LongTensor([[1,2,3],[4,5,6]])
+        example_next_words = torch.LongTensor([[2,3,4], [5,6,7]])
 
         words2Embeddings = TokenEncoder(self.d_model, self.vocab)
         encoder_layer = TransformerEncoderLayer(self.d_model, self.number_of_heads)
@@ -66,3 +66,20 @@ class TestClass:
 
         input_embeddings_1 = token_encoder.forward(example_input_words_1)
         input_embeddings_2 = token_encoder.forward(example_input_words_2)
+
+    def test_transformer_encoder_with_word_inputs(self):
+        number_of_tokens = 3
+        number_of_encoder_layers = 6
+        example_input_words_1 = torch.LongTensor([1,2,3])
+        example_input_words_2 = torch.LongTensor([[1,2,3], [2,3,4]])
+
+        token_encoder = TokenEncoder(self.d_model, self.vocab)
+        encoder_layer = TransformerEncoderLayer(self.d_model, self.number_of_heads)
+        encoder = TransformerEncoder(encoder_layer, number_of_encoder_layers)
+
+        input_embeddings_1 = token_encoder.forward(example_input_words_1)
+        input_embeddings_2 = token_encoder.forward(example_input_words_2)
+
+        memory_1 = encoder.forward(input_embeddings_1)
+        memory_2 = encoder.forward(input_embeddings_2)
+
