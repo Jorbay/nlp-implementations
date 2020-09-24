@@ -22,14 +22,12 @@ class TransformerModel(nn.Module):
         self.transformer_decoder = TransformerDecoder(self.transformer_decoder_layer, self.ndecoder_layers)
         self.token_decoder = TokenDecoder(self.d_model, self.vocab)
 
-    def forward(self, src):
+    def forward(self, src, target):
         src_encoded = self.token_encoder.forward(src)
-
-        #TODO: I need to also make an encoding of expected output (src shifted)
-        target = None
+        target_encoded = self.token_encoder.forward(target)
 
         memory = self.transformer_encoder.forward(src_encoded)
-        output_encoded = self.transformer_decoder.forward(target, memory)
+        output_encoded = self.transformer_decoder.forward(target_encoded, memory)
 
         output = self.token_decoder.forward(output_encoded)
 

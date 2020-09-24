@@ -139,4 +139,7 @@ class TokenEncoder(nn.Module):
 
         positional_encoding = make_positional_encoding(number_of_tokens, self.d_model)
 
+        #Move positional encoding to same device as embedded tensor
+        positional_encoding = embedded.new(positional_encoding)
+
         return embedded + positional_encoding
