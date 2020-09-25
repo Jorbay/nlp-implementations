@@ -6,21 +6,26 @@ from .transformer_modules import TransformerDecoder, TransformerEncoder, Transfo
 
 class TransformerModel(nn.Module):
 
-    def __init__(self, ntokens_per_batch, nencoder_layers, ndecoder_layers, d_model, nheads, vocab):
+    def __init__(self, nencoder_layers, ndecoder_layers, d_model, vocab, nheads, dim_feedforward = 2048, dropout= 0.1,
+                 activation="relu"):
         super(TransformerModel, self).__init__()
-        self.ntokens_per_batch = ntokens_per_batch
         self.nencoder_layers = nencoder_layers
         self.ndecoder_layers = ndecoder_layers
         self.d_model = d_model
-        self.nheads = nheads
         self.vocab = vocab
+        self.nheads = nheads
+        self.dim_feedforward = dim_feedforward;
+        self.dropout = dropout;
+        self.activation = activation;
 
         self.token_encoder = TokenEncoder(self.d_model, self.vocab)
-        self.transformer_encoder_layer = TransformerEncoderLayer(self.d_model, self.nheads)
+        self.transformer_encoder_layer = TransformerEncoderLayer(self.d_model, self.nheads, self.dim_feedforward,
+                                                                 self.dropout)
         self.transformer_encoder = TransformerEncoder(self.transformer_encoder_layer, self.nencoder_layers)
-        self.transformer_decoder_layer = TransformerDecoderLayer(self.d_model, self.nheads)
+        self.transformer_decoder_layer = TransformerDecoderLayer(self.d_model, self.nheads, self.dim_feedforward,
+                                                                 self.dropout, self.activation)
         self.transformer_decoder = TransformerDecoder(self.transformer_decoder_layer, self.ndecoder_layers)
-        self.token_decoder = TokenDecoder(self.d_model, self.vocab)
+        self.token_decoder = TokenDecoder(self.d_model, self.vocab, self.dropout)
 
     def forward(self, src, target):
         src_encoded = self.token_encoder.forward(src)

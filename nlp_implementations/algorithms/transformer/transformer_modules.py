@@ -26,14 +26,17 @@ class TransformerEncoderLayer(nn.Module):
         self.normalizer = nn.LayerNorm(d_model)
         self.multiHeadAttention = MultiHeadAttention(nhead, d_model)
         self.feedForwardNetwork = FeedForwardNetwork(d_model, dim_feedforward, d_model)
+        self.dropout = nn.Dropout(p=dropout)
 
     def forward(self, src: torch.Tensor, src_mask: Optional[torch.Tensor] = None,
                 src_key_padding_mask: Optional[torch.Tensor] = None):
         "Take in embedding and output hidden state + output of type torch.Tensor"
         result = self.multiHeadAttention.forward(src, src, src, src_mask)
+        result = self.dropout(result)
         result = self.__addAndNorm(result, src)
 
         feed_forward_result = self.feedForwardNetwork.forward(result)
+        feed_forward_result = self.dropout(feed_forward_result)
         result = self.__addAndNorm(feed_forward_result, result)
 
         return result
@@ -73,6 +76,7 @@ class TransformerDecoderLayer(nn.Module):
         self.normalizer = nn.LayerNorm(d_model)
         self.multiHeadAttention = MultiHeadAttention(nhead, d_model)
         self.feedForwardNetwork = FeedForwardNetwork(d_model, dim_feedforward, d_model)
+        self.dropout = nn.Dropout(p=dropout)
 
     def forward(self, tgt: Tensor, memory: Tensor,
                 tgt_mask: Optional[Tensor] = None,
@@ -83,12 +87,15 @@ class TransformerDecoderLayer(nn.Module):
         # Memory is the hidden state from the encoder
         # TGT_mask is the mask needed for masked multi-head attention
         result = self.multiHeadAttention.forward(tgt, tgt, tgt, tgt_mask)
+        result = self.dropout(result)
         result = self.__addAndNorm(result, tgt)
 
         intermediate_result = self.multiHeadAttention.forward(memory, memory, tgt)
+        intermediate_result = self.dropout(intermediate_result)
         result = self.__addAndNorm(intermediate_result, result)
 
         feed_forward_result = self.feedForwardNetwork.forward(result)
+        feed_forward_result = self.dropout(feed_forward_result)
         result = self.__addAndNorm(feed_forward_result, result)
 
         return result
@@ -127,11 +134,12 @@ class TokenDecoder(nn.Module):
         return result
 
 class TokenEncoder(nn.Module):
-    def __init__(self, d_model, vocab):
+    def __init__(self, d_model, vocab, dropout=0.1):
         super(TokenEncoder, self).__init__()
         self.embedder = Embedding(d_model, vocab)
         self.d_model = d_model
         self.vocab = vocab
+        self.dropout = nn.Dropout(p=dropout)
 
     def forward(self, x):
         embedded = self.embedder.forward(x)
@@ -142,4 +150,7 @@ class TokenEncoder(nn.Module):
         #Move positional encoding to same device as embedded tensor
         positional_encoding = positional_encoding.to(embedded.device)
 
-        return embedded + positional_encoding
+        result = embedded + positional_encoding
+        result = self.dropout(result)
+
+        return result
