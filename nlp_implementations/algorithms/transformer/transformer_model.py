@@ -18,14 +18,14 @@ class TransformerModel(nn.Module):
         self.dropout = dropout;
         self.activation = activation;
 
-        self.token_encoder = TokenEncoder(self.d_model, self.vocab)
-        self.transformer_encoder_layer = TransformerEncoderLayer(self.d_model, self.nheads, self.dim_feedforward,
-                                                                 self.dropout)
+        self.token_encoder = TokenEncoder(self.d_model, self.vocab, dropout = self.dropout)
+        self.transformer_encoder_layer = TransformerEncoderLayer(self.d_model, self.nheads, dim_feedforward = self.dim_feedforward,
+                                                                 dropout = self.dropout)
         self.transformer_encoder = TransformerEncoder(self.transformer_encoder_layer, self.nencoder_layers)
-        self.transformer_decoder_layer = TransformerDecoderLayer(self.d_model, self.nheads, self.dim_feedforward,
-                                                                 self.dropout, self.activation)
+        self.transformer_decoder_layer = TransformerDecoderLayer(self.d_model, self.nheads, dim_feedforward = self.dim_feedforward,
+                                                                 dropout = self.dropout, activation = self.activation)
         self.transformer_decoder = TransformerDecoder(self.transformer_decoder_layer, self.ndecoder_layers)
-        self.token_decoder = TokenDecoder(self.d_model, self.vocab, self.dropout)
+        self.token_decoder = TokenDecoder(self.d_model, self.vocab)
 
     def forward(self, src, target):
         src_encoded = self.token_encoder.forward(src)
