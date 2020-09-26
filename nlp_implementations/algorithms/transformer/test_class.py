@@ -3,6 +3,8 @@ from .embedding import Embedding
 from .toolbox import SingleLayerPerceptron, make_mask
 from .transformer_modules import TransformerDecoder, TransformerEncoder, TransformerEncoderLayer, \
     TransformerDecoderLayer, TokenDecoder, TokenEncoder
+from .transformer_model import TransformerModel
+
 import torch
 
 class TestClass:
@@ -83,3 +85,16 @@ class TestClass:
         memory_1 = encoder.forward(input_embeddings_1)
         memory_2 = encoder.forward(input_embeddings_2)
 
+    def test_transformer_model(self):
+        number_of_encoder_layers = 6
+        number_of_decoder_layers = 6
+        example_input_words_1 = torch.LongTensor([1, 2, 3])
+        example_input_words_2 = torch.LongTensor([[1, 2, 3], [2, 3, 4]])
+        example_target_words_1 = torch.LongTensor([2, 3, 4])
+        example_target_words_2 = torch.LongTensor([[2, 3, 4], [3, 4, 5]])
+
+        transformer_model = TransformerModel(number_of_encoder_layers, number_of_decoder_layers, self.d_model,
+                                             self.vocab, self.number_of_heads)
+
+        output_1 = transformer_model.forward(example_input_words_1, example_target_words_1)
+        output_2 = transformer_model.forward(example_input_words_2, example_target_words_2)

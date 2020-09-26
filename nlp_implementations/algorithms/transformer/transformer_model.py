@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from .transformer_modules import TransformerDecoder, TransformerEncoder, TransformerEncoderLayer, \
     TransformerDecoderLayer, TokenDecoder, TokenEncoder
+from .toolbox import make_mask
 
 
 class TransformerModel(nn.Module):
@@ -32,7 +33,8 @@ class TransformerModel(nn.Module):
         target_encoded = self.token_encoder.forward(target)
 
         memory = self.transformer_encoder.forward(src_encoded)
-        output_encoded = self.transformer_decoder.forward(target_encoded, memory)
+        mask = make_mask(src_encoded.size()[1])
+        output_encoded = self.transformer_decoder.forward(target_encoded, memory, mask)
 
         output = self.token_decoder.forward(output_encoded)
 
