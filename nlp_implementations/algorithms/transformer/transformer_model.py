@@ -32,8 +32,11 @@ class TransformerModel(nn.Module):
         src_encoded = self.token_encoder.forward(src)
         target_encoded = self.token_encoder.forward(target)
 
-        memory = self.transformer_encoder.forward(src_encoded)
+        #Move mask to same device as target_encoded
         mask = make_mask(src_encoded.size()[1])
+        mask = mask.to(src_encoded.device)
+
+        memory = self.transformer_encoder.forward(src_encoded)
         output_encoded = self.transformer_decoder.forward(target_encoded, memory, mask)
 
         output = self.token_decoder.forward(output_encoded)
