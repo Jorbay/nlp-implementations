@@ -28,6 +28,13 @@ class TransformerModel(nn.Module):
         self.transformer_decoder = TransformerDecoder(self.transformer_decoder_layer, self.ndecoder_layers)
         self.token_decoder = TokenDecoder(self.d_model, self.vocab)
 
+    def init_weights(self):
+        #The following was based off a recommended implementation from https://pytorch.org/tutorials/beginner/transformer_tutorial.html
+        initrange = 0.1
+        self.token_encoder.embedder.lookup_table.weight.data.uniform_(-initrange, initrange)
+        self.token_decoder.linear_layer.weight.data.uniform_(initrange)
+        self.token_decoder.linear_layer.bias.data.zero_()
+
     def forward(self, src, target):
         src_encoded = self.token_encoder.forward(src)
         target_encoded = self.token_encoder.forward(target)
